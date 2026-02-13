@@ -1,4 +1,4 @@
-name: Build VeloFetch macOS Only
+name: Build InstantSava macOS Only
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
           # standalone と macos-create-app-bundle は mode: app が自動で処理するため削除
           # -----------------------
           enable-plugins: tk-inter
-          include-data-dir: ${{ env.pythonLocation }}/lib/python3.12/site-packages/customtkinter=customtkinter
+          include-data-dir: ${{ env.pythonLocation }}/lib/python3.14/site-packages/customtkinter=customtkinter
           # --- アイコン設定を追加 ---
           macos-app-icon: Image/icon.icns
 
