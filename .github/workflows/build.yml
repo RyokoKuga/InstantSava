@@ -3,6 +3,8 @@ name: Build InstantSava EXE
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - '**.yml'  # 設定を変えた時のみ実
   workflow_dispatch: 
 
 jobs:
