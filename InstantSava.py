@@ -45,14 +45,11 @@ def get_local_ip():
     except Exception:
         return "127.0.0.1"
 
-# --- 2. カスタムアラートダイアログ (修正済み) ---
+# --- 2. カスタムアラートダイアログ ---
 class SavaFarmAlert(ctk.CTkToplevel):
     def __init__(self, parent, title, message):
         super().__init__(parent)
-        
-        # チラつき防止: 描画準備ができるまで隠す
         self.withdraw()
-        
         self.title(title)
         self.geometry("340x200")
         self.resizable(False, False)
@@ -62,23 +59,25 @@ class SavaFarmAlert(ctk.CTkToplevel):
         ctk.CTkLabel(self, text=message, font=("Helvetica", 13), wraplength=280).pack(pady=10)
         ctk.CTkButton(self, text="OK", width=100, command=self.destroy).pack(pady=15)
 
-        # 座標計算の前に最新の状態に更新
         self.update_idletasks()
-        
-        # 親ウィンドウの中央に配置
         x = parent.winfo_x() + (parent.winfo_width() // 2) - (self.winfo_width() // 2)
         y = parent.winfo_y() + (parent.winfo_height() // 2) - (self.winfo_height() // 2)
         self.geometry(f"+{x}+{y}")
-
-        # 準備完了後に表示してフォーカスを奪う
         self.deiconify()
         self.grab_set()
 
 # --- 3. セキュリティ & 利便性強化版ハンドラー ---
 class SavaFarmHandler(http.server.SimpleHTTPRequestHandler):
-    # アクセスログを出力しないようにオーバーライド
+    def translate_path(self, path):
+        path = super().translate_path(path)
+        root = os.path.abspath(self.directory)
+        if not os.path.abspath(path).startswith(root):
+            return root
+        return path
+
     def log_message(self, format, *args):
         pass
+
     def list_directory(self, path):
         try:
             list_dir = [f for f in os.listdir(path) if not f.startswith('.')]
@@ -116,9 +115,7 @@ class SavaFarmHandler(http.server.SimpleHTTPRequestHandler):
             <h1>{displaypath}</h1>
             <span class="brand">INSTANTSAVA</span>
         </div>
-        <ul>
-        {"<li><a href='..'><span class='icon'>" + icon_folder + "</span><span>../ (Parent Directory)</span></a></li>" if self.path != "/" else ""}
-        """
+        <ul>"""
 
         for name in list_dir:
             fullname = os.path.join(path, name)
@@ -141,16 +138,13 @@ class SavaFarmHandler(http.server.SimpleHTTPRequestHandler):
 class ReusableTCPServer(socketserver.TCPServer):
     allow_reuse_address = True
 
-# --- 5. 環境設定モーダル (修正済み) ---
+# --- 5. 環境設定モーダル ---
 class SettingsWindow(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
-        
-        # チラつき防止
         self.withdraw()
-        
         self.title("InstantSava Settings")
-        self.geometry("500x330")
+        self.geometry("500x380")
         self.parent = parent
         self.transient(parent)
         self.resizable(False, False)
@@ -162,29 +156,31 @@ class SettingsWindow(ctk.CTkToplevel):
         ctk.CTkLabel(self.sec_path, text="Target Directory:", font=("Helvetica", 12)).pack(anchor="w")
         
         self.path_row = ctk.CTkFrame(self.sec_path, fg_color="transparent")
-        self.path_row.pack(fill="x", pady=(5, 15))
+        self.path_row.pack(fill="x", pady=(5, 10))
         self.entry_path = ctk.CTkEntry(self.path_row, placeholder_text="Select folder...")
         self.entry_path.pack(side="left", fill="x", expand=True, padx=(0, 10))
         self.entry_path.insert(0, parent.config.get("last_path", ""))
-        
         self.btn_browse = ctk.CTkButton(self.path_row, text="Browse", width=80, fg_color="#444", command=self.browse_path)
         self.btn_browse.pack(side="right")
 
         ctk.CTkLabel(self, text="Port Number (1024-65535):", font=("Helvetica", 12)).pack(padx=40, anchor="w")
         self.port_entry = ctk.CTkEntry(self, width=120, justify="center")
-        self.port_entry.pack(pady=(5, 15))
+        self.port_entry.pack(pady=(5, 10))
         self.port_entry.insert(0, parent.config.get("last_port", "8000"))
+
+        self.public_var = ctk.BooleanVar(value=parent.config.get("allow_public", False))
+        self.check_public = ctk.CTkCheckBox(self, text="Allow Access from Other Devices (0.0.0.0)", 
+                                           variable=self.public_var, font=("Helvetica", 12))
+        self.check_public.pack(pady=10)
 
         self.btn_save = ctk.CTkButton(self, text="Apply & Close", font=("Helvetica", 13, "bold"), 
                                      fg_color="#3B8ED0", hover_color="#2B6DA0", height=40, command=self.save_settings)
-        self.btn_save.pack(pady=(15, 5))
+        self.btn_save.pack(pady=(20, 5))
 
-        # 座標計算と表示
         self.update_idletasks()
         x = parent.winfo_x() + (parent.winfo_width() // 2) - (self.winfo_width() // 2)
         y = parent.winfo_y() + (parent.winfo_height() // 2) - (self.winfo_height() // 2)
         self.geometry(f"+{x}+{y}")
-        
         self.deiconify()
         self.grab_set()
 
@@ -202,6 +198,7 @@ class SettingsWindow(ctk.CTkToplevel):
 
         self.parent.config["last_path"] = self.entry_path.get()
         self.parent.config["last_port"] = port_raw
+        self.parent.config["allow_public"] = self.public_var.get()
         self.parent.save_config()
         self.parent.update_display()
         self.destroy()
@@ -219,7 +216,7 @@ class SavaFarmMain(ctk.CTk):
 
         self.httpd = None
         self._lock = threading.Lock()
-        self.config = {"last_path": str(Path.home()), "last_port": "8000"}
+        self.config = {"last_path": str(Path.home()), "last_port": "8000", "allow_public": False}
         self.load_config()
 
         self.setup_ui()
@@ -234,8 +231,11 @@ class SavaFarmMain(ctk.CTk):
         
         self.path_info = ctk.CTkLabel(self.info_card, text="", font=("Helvetica", 12), text_color="#DCE4EE", wraplength=280)
         self.path_info.pack(pady=(18, 4))
-        self.port_info = ctk.CTkLabel(self.info_card, text="", font=("Helvetica", 12, "bold"), text_color="#3B8ED0")
+        
+        # URLラベル（クリックでコピー可能にする）
+        self.port_info = ctk.CTkLabel(self.info_card, text="", font=("Helvetica", 12, "bold"), text_color="#3B8ED0", cursor="hand2")
         self.port_info.pack(pady=(0, 18))
+        self.port_info.bind("<Button-1>", self.copy_url_to_clipboard) # 左クリックをバインド
         
         self.update_display()
 
@@ -247,12 +247,29 @@ class SavaFarmMain(ctk.CTk):
                                          text_color="gray", hover_color="#222", command=self.open_settings)
         self.btn_settings.pack(side="bottom", pady=20)
 
+    # コピー機能の実装
+    def copy_url_to_clipboard(self, event):
+        url_text = self.port_info.cget("text")
+        if "http://" in url_text:
+            clean_url = url_text.replace("Online: ", "")
+            self.clipboard_clear()
+            self.clipboard_append(clean_url)
+            
+            # 一時的に表示を変えてコピー完了を伝える
+            original_text = url_text
+            self.port_info.configure(text="Copied to clipboard!", text_color="#27AE60")
+            self.after(1500, lambda: self.port_info.configure(text=original_text, text_color="#3B8ED0"))
+
     def update_display(self):
         path = self.config.get("last_path", "None selected")
         port = self.config.get("last_port", "8000")
         display_path = (path[:40] + '...') if len(path) > 40 else path
         self.path_info.configure(text=f"Folder: {display_path}")
-        self.port_info.configure(text=f"Port: {port}")
+        
+        if self.config.get("allow_public", False):
+            self.port_info.configure(text=f"Port: {port} (Public)")
+        else:
+            self.port_info.configure(text=f"Port: {port} (Local Only)")
 
     def load_config(self):
         if os.path.exists(CONFIG_FILE):
@@ -280,7 +297,10 @@ class SavaFarmMain(ctk.CTk):
     def start_server(self):
         path = self.config["last_path"]
         port = int(self.config["last_port"])
-        local_ip = get_local_ip()
+        allow_public = self.config.get("allow_public", False)
+        
+        listen_addr = "0.0.0.0" if allow_public else "127.0.0.1"
+        display_ip = get_local_ip() if allow_public else "127.0.0.1"
 
         if not os.path.exists(path):
             SavaFarmAlert(self, "Path Error", "The selected directory does not exist.")
@@ -289,7 +309,7 @@ class SavaFarmMain(ctk.CTk):
         def run_thread():
             handler = partial(SavaFarmHandler, directory=path)
             try:
-                with ReusableTCPServer(("0.0.0.0", port), handler) as server:
+                with ReusableTCPServer((listen_addr, port), handler) as server:
                     with self._lock:
                         self.httpd = server
                     server.serve_forever()
@@ -304,9 +324,9 @@ class SavaFarmMain(ctk.CTk):
         self.btn_launch.configure(text="Stop Server", fg_color="#E74C3C", hover_color="#C0392B")
         self.btn_settings.configure(state="disabled")
         self.info_card.configure(border_color="#27AE60")
-        self.port_info.configure(text=f"Online: http://{local_ip}:{port}")
         
-        webbrowser.open(f"http://localhost:{port}")
+        self.port_info.configure(text=f"Online: http://{display_ip}:{port}")
+        webbrowser.open(f"http://127.0.0.1:{port}")
 
     def stop_server(self):
         with self._lock:
@@ -329,7 +349,6 @@ class SavaFarmMain(ctk.CTk):
         os._exit(0)
 
 if __name__ == "__main__":
-    # WindowsのEXE化においてスレッド/プロセス管理を安定させるために追加
     import multiprocessing
     multiprocessing.freeze_support()
     
