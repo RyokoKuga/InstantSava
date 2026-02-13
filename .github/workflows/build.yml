@@ -31,7 +31,7 @@ jobs:
           script-name: InstantSava.py
           mode: onefile
           # パラメータ名を修正: windows-disable-console -> disable-console
-          disable-console: false
+          disable-console: true
           enable-plugins: tk-inter,multiprocessing # スレッド管理を安定させる
           # パッケージ全体を含める設定を追加
           include-package: customtkinter
