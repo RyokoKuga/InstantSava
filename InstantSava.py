@@ -14,6 +14,11 @@ import socket
 from pathlib import Path
 from functools import partial
 
+# コンソールがない場合に標準出力を無効化する
+if sys.executable.endswith("pythonw.exe") or "--noconsole" in sys.argv:
+    sys.stdout = open(os.devnull, "w")
+    sys.stderr = open(os.devnull, "w")
+
 # --- 1. 定数とパスの設定 ---
 APP_NAME = "InstantSava"
 
@@ -71,6 +76,9 @@ class SavaFarmAlert(ctk.CTkToplevel):
 
 # --- 3. セキュリティ & 利便性強化版ハンドラー ---
 class SavaFarmHandler(http.server.SimpleHTTPRequestHandler):
+    # アクセスログを出力しないようにオーバーライド
+    def log_message(self, format, *args):
+        pass
     def list_directory(self, path):
         try:
             list_dir = [f for f in os.listdir(path) if not f.startswith('.')]
