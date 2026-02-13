@@ -34,8 +34,20 @@ python InstantSava.py
 ```
 
 ## ■ Usage
-Launch: Run the application.
 
-1. Setup: Click `Preferences`, select your desired folder and port number, and apply the settings.
-2. Start: Click `Launch Server` to open your browser and start the local server.
-3. Stop: Click `Stop Server` to shut down the local server.
+1.  **Preferences**: Click the `⚙ Preferences` button to select your **Target Directory** and **Port Number**.
+2.  **Sharing with Other Devices**:
+    * To access your files from a smartphone or another PC on the same network, open **Preferences** and check the box: **"Allow Access from Other Devices (0.0.0.0)"**.
+    * Click **Apply & Close** to save your settings.
+3.  **Launch**: Click **Launch Server** to start the local server and automatically open your browser.
+    * *Tip: Once the server is online, you can click the displayed URL (e.g., `http://192.168.x.x:8000`) to copy it directly to your clipboard.*
+4.  **Stop**: Click **Stop Server** to instantly shut down the connection.
+
+---
+
+## ■ Troubleshooting
+If you cannot connect from another device:
+
+* **Firewall Note**: Since you're asking users to enable 0.0.0.0 access, Windows users might see a "Windows Defender Firewall" popup the first time they launch. You might want to add a small note to your "First-Time Launch" section advising them to "Allow Access" for Private Networks if that popup appears.
+
+* **Wired vs. Wireless**: If a user can't connect from their phone even with the setting on, it's usually because the devices aren't on the same subnet (e.g., one is on 5G/LTE and the other is on Wi-Fi).
