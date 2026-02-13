@@ -281,7 +281,7 @@ class SavaFarmMain(ctk.CTk):
         def run_thread():
             handler = partial(SavaFarmHandler, directory=path)
             try:
-                with ReusableTCPServer(("0.0.0.0", port), handler) as server:
+                with ReusableTCPServer(("127.0.0.1", port), handler) as server:
                     with self._lock:
                         self.httpd = server
                     server.serve_forever()
