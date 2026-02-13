@@ -24,14 +24,23 @@ Since the app is unsigned, your operating system's security features may trigger
 1. Right-click (or Control-click) the file and select **"Open"**.
 2. When the confirmation dialog appears, click **"Open"** again.
 
-## ■ Python Environment
-To run the application within a Python environment:
+## Running from Source (Alternative)
+If the standalone executable (`.exe` or `.app`) does not launch on your system, you can run **InstantSava** directly using Python.  
 
-**How to run:**
-```bash
-pip install customtkinter
-python InstantSava.py
-```
+1.  **Check your Python version**
+    Make sure you have Python 3.12+ installed:
+    ```bash
+    python3 --version
+    ```
+2.  **Install the required package**
+    Install `customtkinter` via pip:
+    ```bash
+    pip3 install customtkinter
+    ```
+3.  **Run the application**
+    ```bash
+    python3 InstantSava.py
+    ```
 
 ## ■ Usage
 
