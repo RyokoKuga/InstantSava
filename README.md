@@ -6,7 +6,9 @@
 
 <img src="Image/Card.png" width="600px"> 
 
-No complex configuration required. Anyone can spin up a local server "right now" with ease.
+No complex configuration required. Anyone can spin up a local server "right now" with ease.  
+
+[**🌐 Official Website (JP)**](https://pc-chem-basics.blog.jp/InstantSava.html)
 
 ## ■ Download
 Pre-built binaries are available on the [**Releases**](https://github.com/RyokoKuga/InstantSava/releases) page.
