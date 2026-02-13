@@ -29,9 +29,9 @@ jobs:
         with:
           nuitka-version: main
           script-name: InstantSava.py
-          mode: onefile
+          mode: standalone
           # パラメータ名を修正: windows-disable-console -> disable-console
-          disable-console: true 
+          disable-console: false 
           enable-plugins: tk-inter,multiprocessing # スレッド管理を安定させる
           # パッケージ全体を含める設定を追加
           include-package: customtkinter
