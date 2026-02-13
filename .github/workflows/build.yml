@@ -3,8 +3,6 @@ name: Build InstantSava EXE
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - '**.yml'  # 設定を変えた時のみ実行
   workflow_dispatch: 
 
 jobs:
@@ -17,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12' # 安定版の3.12に変更
           cache: 'pip'
 
       - name: Install dependencies
@@ -25,19 +23,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install customtkinter
           pip install nuitka zstandard
+
       - name: Build EXE with Nuitka
         uses: Nuitka/Nuitka-Action@main
         with:
           nuitka-version: main
           script-name: InstantSava.py
-          # --- 重複を避けるため mode のみに絞る ---
           mode: onefile
-          windows-disable-console: true
+          # パラメータ名を修正: windows-disable-console -> disable-console
+          disable-console: true 
           enable-plugins: tk-inter
+          # パッケージ全体を含める設定を追加
+          include-package: customtkinter
+          # data-dirのパスを環境変数を使用して正確に指定
           include-data-dir: ${{ env.pythonLocation }}/Lib/site-packages/customtkinter=customtkinter
-          # --- アイコン設定を追加 ---
           windows-icon-from-ico: Image/icon.ico
-          # ----------------------------------------------
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
