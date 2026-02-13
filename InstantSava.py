@@ -281,7 +281,7 @@ class SavaFarmMain(ctk.CTk):
         def run_thread():
             handler = partial(SavaFarmHandler, directory=path)
             try:
-                with ReusableTCPServer(("127.0.0.1", port), handler) as server:
+                with ReusableTCPServer(("0.0.0.0", port), handler) as server:
                     with self._lock:
                         self.httpd = server
                     server.serve_forever()
@@ -321,5 +321,9 @@ class SavaFarmMain(ctk.CTk):
         os._exit(0)
 
 if __name__ == "__main__":
+    # WindowsのEXE化においてスレッド/プロセス管理を安定させるために追加
+    import multiprocessing
+    multiprocessing.freeze_support()
+    
     app = SavaFarmMain()
     app.mainloop()
