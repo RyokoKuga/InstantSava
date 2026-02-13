@@ -1,4 +1,4 @@
-name: Build VeloFetch EXE
+name: Build VeloFetch macOS Only
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
   workflow_dispatch: 
 
 jobs:
-  build:
-    runs-on: windows-latest
+  build-macos:
+    runs-on: macos-15-intel
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,24 +23,25 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install customtkinter
-          pip install nuitka zstandard
-      - name: Build EXE with Nuitka
+          pip install customtkinter nuitka zstandard
+      - name: Build App
         uses: Nuitka/Nuitka-Action@main
         with:
           nuitka-version: main
           script-name: InstantSava.py
-          # --- 重複を避けるため mode のみに絞る ---
-          mode: onefile
-          windows-disable-console: true
+          # --- 徹底的に重複を排除 ---
+          mode: app
+          disable-console: true
+          # standalone と macos-create-app-bundle は mode: app が自動で処理するため削除
+          # -----------------------
           enable-plugins: tk-inter
-          include-data-dir: ${{ env.pythonLocation }}/Lib/site-packages/customtkinter=customtkinter
+          include-data-dir: ${{ env.pythonLocation }}/lib/python3.12/site-packages/customtkinter=customtkinter
           # --- アイコン設定を追加 ---
-          windows-icon-from-ico: Image/icon.ico
-          # ----------------------------------------------
+          macos-app-icon: Image/icon.icns
 
-      - name: Upload Artifact
+      - name: Upload macOS App
         uses: actions/upload-artifact@v4
         with:
-          name: InstantSava-Windows-EXE
-          path: build/*.exe
+          name: InstantSava-macOS
+          # 拡張子が .app のディレクトリをアップロード
+          path: build/*.app
