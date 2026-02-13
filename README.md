@@ -8,12 +8,12 @@
 
 No complex configuration required. Anyone can spin up a local server "right now" with ease.
 
-## Download
+## ■ Download
 Pre-built binaries are available on the [**Releases**](https://github.com/RyokoKuga/InstantSava/releases) page.
 * **Windows**: `.exe`
 * **macOS**: `.app`
 
-## First-Time Launch
+## ■ First-Time Launch
 Since the app is unsigned, your operating system's security features may trigger a warning.
 
 ### Windows
@@ -24,7 +24,7 @@ Since the app is unsigned, your operating system's security features may trigger
 1. Right-click (or Control-click) the file and select **"Open"**.
 2. When the confirmation dialog appears, click **"Open"** again.
 
-## Python Environment
+## ■ Python Environment
 To run the application within a Python environment:
 
 **How to run:**
