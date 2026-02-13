@@ -33,7 +33,7 @@ pip install customtkinter
 python InstantSava.py
 ```
 
-Usage
+## ■ Usage
 Launch: Run the application.
 
 1. Setup: Click `Preferences`, select your desired folder and port number, and apply the settings.
