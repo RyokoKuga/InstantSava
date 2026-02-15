@@ -59,6 +59,6 @@ If the standalone executable (`.exe` or `.app`) does not launch on your system, 
 ## ■ Troubleshooting
 If you cannot connect from another device:
 
-* **Firewall Note**: Since you're asking users to enable 0.0.0.0 access, Windows users might see a "Windows Defender Firewall" popup the first time they launch. When connecting from another PC or smartphone, you will need to allow access.
+* **Firewall Note**: Your firewall may display a message requesting permission to access the network. You will need to allow access when connecting from another PC or smartphone.
 
 * **Wired vs. Wireless**: If a user can't connect from their phone even with the setting on, it's usually because the devices aren't on the same subnet (e.g., one is on 5G/LTE and the other is on Wi-Fi).
