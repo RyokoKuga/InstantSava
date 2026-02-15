@@ -8,7 +8,7 @@
 
 No complex configuration required. Anyone can spin up a local server "right now" with ease.  
 
-[**🌐 Official Website (JP)**](https://pc-chem-basics.blog.jp/InstantSava.html)
+[**🌐 Official Website (JP)**](https://pc-chem-basics.blog.jp/InstantSava.html) | [**🌐 Official Website (EN)**](https://pc-chem-basics.blog.jp/InstantSava_en.html)
 
 ## ■ Download
 Pre-built binaries are available on the [**Releases**](https://github.com/RyokoKuga/InstantSava/releases) page.
